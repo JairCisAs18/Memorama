@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../info.dart';
 import '../levels_utils/medium_util.dart';
 import 'easy_level.dart';
@@ -15,13 +15,6 @@ class Medium extends StatelessWidget {
       child: HomeScreen(),
     );
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return const MaterialApp(
-  //     title: 'Flutter Demo',
-  //     home: HomeScreen(),
-  //   );
-  // }
 }
 
 class HomeScreen extends StatefulWidget {
@@ -34,12 +27,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   //setting text style
   TextStyle whiteText = const TextStyle(color: Colors.white);
-  bool hideTest = false;
   Game _game = Game();
 
   //game stats
   int cardCounter=0;
   int played=0;
+  int taps = 0;
+  bool interaction = true;
 
   @override
   void initState() {
@@ -51,6 +45,17 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _game.initGame();
       cardCounter=0;
+    });
+  }
+
+  void disableInteraction(){
+    setState(() {
+      interaction = false;
+    });
+    Timer(Duration(seconds: 2),(){
+      setState(() {
+        interaction = true;
+      });
     });
   }
 
@@ -125,14 +130,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              info_card("Intento", "$tries"),
-              info_card("Puntaje", "$score"),
-            ],
-          ),
+          //Row(
+          //  mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //  crossAxisAlignment: CrossAxisAlignment.center,
+          //  children: [
+          //    info_card("Intento", "$tries"),
+          //    info_card("Puntaje", "$score"),
+          //  ],
+          //),
           Container(
               height: MediaQuery.of(context).size.width,
               width: MediaQuery.of(context).size.width,
@@ -147,10 +152,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        print(_game.matchCheck);
+                        if(interaction == false){
+                          return;
+                        }
+                        if(_game.checkedCards.contains(_game.gameImg![index])){
+                          return;
+                        }
+                        //print(_game.matchCheck);
                         setState(() {
                           //incrementing the clicks
                           //tries++;
+                          taps++;
                           _game.gameImg![index] = _game.cards_list[index];
                           _game.matchCheck
                               .add({index: _game.cards_list[index]});
@@ -163,6 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             //incrementing the score
                             score += 10;
                             cardCounter++;
+                            _game.checkedCards.add(_game.gameImg![index]);
                             _game.matchCheck.clear();
                           } else {
                             print("false");
@@ -187,6 +200,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           if(played==2){
                             nextLevel();
                           }
+                          if(taps%2 != 0) {
+                            disableInteraction();
+                          }
                         }
                       },
                       child: Container(
@@ -202,39 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   })
           ),
-          // ElevatedButton(
-          //   onPressed: resetGame,
-          //   style: ElevatedButton.styleFrom(
-          //     minimumSize: const Size(120,40),
-          //     primary: Colors.purple,
-          //   ),
-          //   child: SizedBox(
-          //     width: 120.0,
-          //     height: 40.0,
-          //     child: Row(
-          //       mainAxisAlignment: MainAxisAlignment.center,
-          //       children: const <Widget>[
-          //         Padding(
-          //           padding: EdgeInsets.only(right: 10.0),
-          //           child: Icon(
-          //             Icons.restart_alt_rounded,
-          //             color: Colors.white,
-          //           ),
-          //         ),
-          //         Padding(
-          //           padding: EdgeInsets.only(left: 10.0),
-          //           child: Text(
-          //             'Reiniciar',
-          //             style: TextStyle(
-          //                 fontSize: 16.0,
-          //                 fontWeight: FontWeight.bold
-          //             ),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

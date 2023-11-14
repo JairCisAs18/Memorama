@@ -35,6 +35,7 @@ class Game {
     "assets/tv.png",
     "assets/tree.png",
   ];
+  List<String> checkedCards = ["assets/heart.png"];
   final int cardCount = 20;
   List<Map<int, String>> matchCheck = [];
 
